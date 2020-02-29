@@ -33,11 +33,15 @@ class Baseline(nn.Module):
         interm_out = torch.cat((interm_out, res), 1)
         interm_out = self.deconv4(interm_out)
         
+        return interm_out
+        
     def encode(self, x):
         interm_out, res = self.conv1(x)
         interm_out = self.conv2(interm_out)
         interm_out = self.conv3(interm_out)
         interm_out = self.conv4(interm_out)
+        
+        return interm_out
 
     def do_train(self, x, y, epochs, batch_size=32, lr=1e-4, verbose=1, checkpoint=None):
         optimizer = optim.Adam(self.parameters(), lr=lr)
