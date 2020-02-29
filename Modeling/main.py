@@ -7,7 +7,7 @@ import torch
 data = d.get_frames('vid.mp4').to('cuda:0')
 
 #Declare model
-model = b.Baseline().to('cuda:0')
+model = b.Baseline('cuda:0').to('cuda:0')
 
 model.train(data, data, 100)
 model = torch.load('')

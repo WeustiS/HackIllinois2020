@@ -20,10 +20,10 @@ class CNNBlock2d(nn.Module):
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, padding=int((kernel_size-1)/2))
         
         if use_batch_norm:
-            self.batch_norm = nn.BatchNorm3d(out_channels)
+            self.batch_norm = nn.BatchNorm2d(out_channels)
         
         if down_sample != 1:
-            self.pooling = nn.MaxPool3d(down_sample, stride=down_sample)
+            self.pooling = nn.MaxPool2d(down_sample, stride=down_sample)
             
         if down_sample == 2 and use_wavelet:
             #Generate wavelet coefs
@@ -47,8 +47,8 @@ class CNNBlock2d(nn.Module):
     def forward(self, x, thresh=0.1):
         
         if self.use_wavelet:
-            res = torch.nn.functional.conv2d(x, filters, stride=2)
-            res = torch.max(res[:,1:], dim=1).values
+            res = torch.nn.functional.conv2d(x, self.wave_filt, stride=2)
+            res = torch.max(res[:,1:], dim=1).values.unsqueeze(1)
             res[res < thresh] = 0
         
         interm_out = self.conv(x)
@@ -81,7 +81,7 @@ class TransposedCNNBlock2d(nn.Module):
         self.deconv = nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride=up_sample, padding=int((kernel_size-up_sample)/2))
         
         if use_batch_norm:
-            self.batch_norm = nn.BatchNorm3d(out_channels)
+            self.batch_norm = nn.BatchNorm2d(out_channels)
         
     def forward(self, x):
         interm_out = self.deconv(x)
