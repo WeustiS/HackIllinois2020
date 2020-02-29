@@ -40,7 +40,7 @@ class CNNBlock2d(nn.Module):
                                    dec_hi.unsqueeze(0)*dec_hi.unsqueeze(1)], dim=0)
             filters = filters.expand([in_channels] + list(filters.shape)).permute(1, 0, 2, 3)
     
-            self.wave_filt = torch.as_tensor(filters)
+            self.wave_filt = torch.nn.Parameter(filters)
             self.wave_filt.requires_grad= False
             
         
