@@ -10,7 +10,6 @@ data = d.get_frames('vid.mp4').to('cuda:0')
 model = b.Baseline('cuda:0').to('cuda:0')
 
 model.do_train(data, data, 100)
-model = torch.load('')
 
 real = v.gen_gif(data[:100].detach().cpu())
 real.save('real.gif')
