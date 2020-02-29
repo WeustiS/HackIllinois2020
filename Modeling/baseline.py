@@ -16,7 +16,7 @@ class Baseline(nn.Module):
         self.conv3 = m.CNNBlock2d(32, 64, 3)
         self.conv4 = m.CNNBlock2d(64, 128, 3)
         
-        self.deconv1 = m.CNNBlock2d(128, 64, 4)
+        self.deconv1 = m.TransposedCNNBlock2d(128, 64, 4)
         self.deconv2 = m.TransposedCNNBlock2d(64, 32, 4)
         self.deconv3 = m.TransposedCNNBlock2d(32, 16, 4)
         self.deconv4 = m.TransposedCNNBlock2d(17, 3, 4)
