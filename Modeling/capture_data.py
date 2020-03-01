@@ -37,7 +37,7 @@ def decompose(file_path, save_path, batch_size=64):
             # save frame as JPEG file      
             success, image = vidcap.read()
             image = torch.from_numpy(np.transpose((image / 255), (2, 0, 1))).unsqueeze(0)
-            torch.save(image, os.path.join(save_path, 'frame' + str(count)))
+            torch.save(image, os.path.join(save_path, 'frame' + str(fake_count)))
             fake_count += 1  
             print(fake_count)
         count += 1
