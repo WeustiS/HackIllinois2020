@@ -89,7 +89,7 @@ class Baseline(nn.Module):
                     torch.save(checkpoint, 'checkpoint.pth')   
                     torch.save(self, 'model.pth')
                     
-    def do_train_on_vid(self, folder_path, epochs, batches_per_epoch=25, batch_size=64, lr=1e-5, lambda_coef=1e-3, verbose=1, checkpoint=None):
+    def do_train_on_vid(self, folder_path, epochs, batches_per_epoch=75, batch_size=64, lr=2e-5, lambda_coef=1e-3, verbose=1, checkpoint=None):
         import os
         optimizer = optim.Adam(self.parameters(), lr=lr)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
@@ -130,7 +130,7 @@ class Baseline(nn.Module):
                 y_hat, encoding = self.forward(xbatch)
                 
                 L1_loss = lambda_coef * torch.abs(encoding).mean()
-                loss = ((y_hat - ybatch)**2).mean() + L1_loss
+                loss = ((y_hat - ybatch)**2).mean() 
                 
                 optimizer.zero_grad()
                 loss.backward()
