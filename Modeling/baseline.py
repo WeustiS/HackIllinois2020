@@ -129,7 +129,7 @@ class Baseline(nn.Module):
                     success, image = vidcap.read()
                     xbatch.append(image / 255)
                     count += 1
-                    print(count)
+                    print(image.shape)
                     
                 xbatch = torch.as_tensor(xbatch).to(self.device)
                 ybatch = torch.as_tensor(xbatch).to(self.device)
