@@ -29,11 +29,15 @@ def decompose(file_path, save_path, batch_size=64):
     vidcap = cv2.VideoCapture(file_path)
     success,preimage = vidcap.read()
     count = 0
+    fake_count = 0
     
     while success:
-        # save frame as JPEG file      
-        success, image = vidcap.read()
-        image = torch.from_numpy(np.transpose((image / 255), (2, 0, 1))).unsqueeze(0)
-        torch.save(image, os.path.join(save_path, 'frame' + str(count)))
-        count += 1  
-        print(count)
+        if count%20 != 0:
+            
+            # save frame as JPEG file      
+            success, image = vidcap.read()
+            image = torch.from_numpy(np.transpose((image / 255), (2, 0, 1))).unsqueeze(0)
+            torch.save(image, os.path.join(save_path, 'frame' + str(count)))
+            fake_count += 1  
+            print(fake_count)
+        count += 1
