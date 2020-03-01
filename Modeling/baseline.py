@@ -12,13 +12,13 @@ class Baseline(nn.Module):
         
         self.device = device
         
-        self.conv1 = m.CNNBlock2d(3, 16, 3, use_wavelet=True)
-        self.conv2 = m.CNNBlock2d(16, 32, 3)
-        self.conv3 = m.CNNBlock2d(32, 64, 3)
+        self.conv1 = m.CNNBlock2d(3, 4, 3, use_wavelet=True)
+        self.conv2 = m.CNNBlock2d(4, 16, 3)
+        self.conv3 = m.CNNBlock2d(16, 32, 3)
 
-        self.deconv2 = m.TransposedCNNBlock2d(64, 32, 4)
-        self.deconv3 = m.TransposedCNNBlock2d(32, 16, 4)
-        self.deconv4 = m.TransposedCNNBlock2d(17, 3, 4)
+        self.deconv2 = m.TransposedCNNBlock2d(32, 16, 4)
+        self.deconv3 = m.TransposedCNNBlock2d(16, 4, 4)
+        self.deconv4 = m.TransposedCNNBlock2d(5, 3, 4)
         
     def forward(self, x):
         interm_out, res = self.conv1(x)
