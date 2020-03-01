@@ -15,9 +15,7 @@ class Baseline(nn.Module):
         self.conv1 = m.CNNBlock2d(3, 16, 3, use_wavelet=True)
         self.conv2 = m.CNNBlock2d(16, 32, 3)
         self.conv3 = m.CNNBlock2d(32, 64, 3)
-        self.conv4 = m.CNNBlock2d(64, 128, 3)
-        
-        self.deconv1 = m.TransposedCNNBlock2d(128, 64, 4)
+
         self.deconv2 = m.TransposedCNNBlock2d(64, 32, 4)
         self.deconv3 = m.TransposedCNNBlock2d(32, 16, 4)
         self.deconv4 = m.TransposedCNNBlock2d(17, 3, 4)
@@ -26,9 +24,7 @@ class Baseline(nn.Module):
         interm_out, res = self.conv1(x)
         interm_out = self.conv2(interm_out)
         interm_out = self.conv3(interm_out)
-        interm_out = self.conv4(interm_out)
-        
-        interm_out = self.deconv1(interm_out)
+
         interm_out = self.deconv2(interm_out)
         interm_out = self.deconv3(interm_out)
         interm_out = torch.cat((interm_out, res), 1)
@@ -40,7 +36,6 @@ class Baseline(nn.Module):
         interm_out, res = self.conv1(x)
         interm_out = self.conv2(interm_out)
         interm_out = self.conv3(interm_out)
-        interm_out = self.conv4(interm_out)
         
         return interm_out
 
@@ -130,11 +125,9 @@ class Baseline(nn.Module):
                     image = cv2.resize(image, (1152, 2048))
                     xbatch.append(image / 255)
                     count += 1
-                    print(count)
-                   
                     
-                xbatch = torch.as_tensor(xbatch).to(self.device)
-                ybatch = torch.as_tensor(xbatch).to(self.device)
+                xbatch = torch.as_tensor(xbatch).to(self.device).permute(0, 3, 1, 2)
+                ybatch = torch.as_tensor(xbatch).to(self.device).permute(0, 3, 1, 2)
                 
                 y_hat = self.forward(xbatch)
             
