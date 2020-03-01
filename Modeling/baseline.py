@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import torch.optim as optim
+import torch.nn.functional as F
 
 import modules as m
 
@@ -18,7 +19,8 @@ class Baseline(nn.Module):
         self.deconv2 = m.TransposedCNNBlock2d(32, 16, 4)
         self.deconv3 = m.TransposedCNNBlock2d(16, 4, 4)
         self.deconv4 = m.TransposedCNNBlock2d(5, 3, 4)
-        
+        self.final = nn.Conv2d(3, 3, 3, padding=1)
+
     def forward(self, x):
         interm_out, res = self.conv1(x)
         interm_out = self.conv2(interm_out)
@@ -28,6 +30,7 @@ class Baseline(nn.Module):
         interm_out = self.deconv3(interm_out)
         interm_out = torch.cat((interm_out, res), 1)
         interm_out = self.deconv4(interm_out)
+        interm_out = torch.sigmoid(self.final(interm_out))
         
         return interm_out, encoding
         
