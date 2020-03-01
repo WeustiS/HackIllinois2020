@@ -6,12 +6,12 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 r0 = torch.rand(1, 3, 1080, 720).to(device)
 
 def measure(model, r):
-    arr = [0] * 9
+    total_time = 0
     for i in range(25):
         model(r)
     for i in range(10):
-        arr = [sum(x) for x in zip(arr, model(r))]
-    return sum(arr)
+        total_time += model(r)
+    return total_time
 
 
 model = Baseline().to(device)

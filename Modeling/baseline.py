@@ -4,7 +4,7 @@ import numpy as np
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import modules as m
-
+import time
 class Baseline(nn.Module):
     def __init__(self, device):
         super(Baseline, self).__init__()
@@ -20,52 +20,16 @@ class Baseline(nn.Module):
         self.deconv4 = m.TransposedCNNBlock2d(5, 3, 4)
         
     def forward(self, x):
-        plt.imsave("./frames_m1/input.jpg", x.cpu().squeeze().permute(1,2,0).numpy())
-
+        t = time.time()
         interm_out, res = self.conv1(x)
-        plt.imsave("./frames_m1/res.jpg", res.squeeze().cpu().detach().numpy())
-        plt.imsave("./frames_m1/l1.jpg", (torch.cat((torch.max(interm_out[:,:2], 1).values.unsqueeze(1), interm_out[:, 2:]), 1)).cpu().squeeze().permute(1,2,0).detach().numpy()/interm_out.max().cpu().detach().numpy())
         interm_out = self.conv2(interm_out)
-        plt.imsave("./frames_m1/l2.jpg", (torch.cat(
-            (
-                torch.max(interm_out[:, :5], 1).values.unsqueeze(1),
-                torch.max(interm_out[:, 5:10], 1).values.unsqueeze(1),
-                torch.max(interm_out[:, 10:15], 1).values.unsqueeze(1)
-            ),1)).cpu().squeeze().permute(1, 2, 0).detach().numpy() / interm_out.max().cpu().detach().numpy())
-
         interm_out = self.conv3(interm_out)
-        plt.imsave("./frames_m1/l3.jpg", (torch.cat(
-            (
-                torch.max(interm_out[:, :10], 1).values.unsqueeze(1),
-                torch.max(interm_out[:, 10:20], 1).values.unsqueeze(1),
-                torch.max(interm_out[:, 20:30], 1).values.unsqueeze(1)
-            ), 1)).cpu().squeeze().permute(1, 2, 0).detach().numpy() / interm_out.max().cpu().detach().numpy())
-
-
         interm_out = self.deconv2(interm_out)
-        plt.imsave("./frames_m1/l4.jpg", (torch.cat(
-            (
-                torch.max(interm_out[:, :5], 1).values.unsqueeze(1),
-                torch.max(interm_out[:, 5:10], 1).values.unsqueeze(1),
-                torch.max(interm_out[:, 10:15], 1).values.unsqueeze(1)
-            ), 1)).cpu().squeeze().permute(1, 2, 0).detach().numpy() / interm_out.max().cpu().detach().numpy())
-
-
         interm_out = self.deconv3(interm_out)
-        plt.imsave("./frames_m1/l5.jpg", (
-            torch.cat(
-                (
-                    torch.max(interm_out[:, :2], 1).values.unsqueeze(1),
-                    interm_out[:, 2:]
-                ),
-                      1)).cpu().squeeze().permute(1, 2, 0).detach().numpy() / interm_out.max().cpu().detach().numpy())
-
-
         interm_out = torch.cat((interm_out, res), 1)
-
         interm_out = self.deconv4(interm_out)
-        plt.imsave("./frames_m1/l6.jpg", interm_out.cpu().squeeze().permute(1,2,0).detach().numpy() / interm_out.max().cpu().detach().numpy())
-        
+        return(time.time() - t)
+
     def encode(self, x):
         interm_out, res = self.conv1(x)
         interm_out = self.conv2(interm_out)
