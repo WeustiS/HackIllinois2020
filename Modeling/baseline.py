@@ -90,7 +90,7 @@ class Baseline(nn.Module):
                     torch.save(checkpoint, 'checkpoint.pth')   
                     torch.save(self, 'model.pth')
                     
-    def do_train_on_vid(self, folder_path, epochs, batches_per_epoch=10, batch_size=128, lr=1e-4, verbose=1, checkpoint=None):
+    def do_train_on_vid(self, folder_path, epochs, batches_per_epoch=10, batch_size=64, lr=1e-4, verbose=1, checkpoint=None):
         import os
         optimizer = optim.Adam(self.parameters(), lr=lr)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
@@ -138,11 +138,6 @@ class Baseline(nn.Module):
                 
                 #if not torch.isnan(loss): 
                 running_loss += loss.detach()
-            
-            #Reload video if march is finished
-            if not success:
-                vidcap = cv2.VideoCapture(file_path)
-                success,image = vidcap.read()
             
             running_loss /= batches_per_epoch
             
