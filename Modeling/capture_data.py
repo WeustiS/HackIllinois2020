@@ -24,24 +24,29 @@ def get_frames(filepath, max_frames=1e7, verbose=1000):
     data = torch.as_tensor(data)
     return data.permute(0, 3, 1, 2)
 
-
+import numpy as np
 def decompose(file_path, save_path, batch_size=64):
     import os
     vidcap = cv2.VideoCapture(file_path)
     success,image = vidcap.read()
     count = 0
     batch_num = 0
-    data = []
-
+    data = torch.zeros(batch_size, image.shape[2], image.shape[0], image.shape[1])
+    
+    frame_count = 0
     while success and batch_num < batch_size:
         # save frame as JPEG file      
         success, image = vidcap.read()
-        data.append(image / 255)
+        image = np.transpose((image / 255), (2, 0, 1))
+        data[frame_count] = image
+        frame_count += 1
         count += 1
         if count%batch_size==0:
-            data = torch.as_tensor(data).reshape(0, 3, 1, 2)
+            frame_count = 0
+            data = np.array(data)
             torch.save(data, os.path.join(save_path, 'batch_' + str(batch_num) + '.pth'))
-            data = []
+            data = torch.zeros(batch_size, image.shape[2], image.shape[0], image.shape[1])
             batch_num += 1
             print("Loading video %s: %.2f%%" % (file_path, batch_num * 100 / batch_size))
+            
         print(count)
