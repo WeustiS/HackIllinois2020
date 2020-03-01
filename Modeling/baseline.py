@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import torch.optim as optim
+import cv2
 
 import modules as m
 
@@ -81,6 +82,74 @@ class Baseline(nn.Module):
                 running_loss += loss.detach()                
             
             running_loss /= (len(x) // batch_size)
+            
+            if (epoch + 1)%verbose == 0:
+                print('[%d]: %.16f' % (epoch + 1, running_loss))
+                scheduler.step(running_loss)
+                if running_loss < min_loss:
+                    min_loss = running_loss
+                    #Save network
+                    checkpoint = {'state_dict':self.state_dict(),
+                                  'optimizer': optimizer.state_dict()}
+                        
+                    torch.save(checkpoint, 'checkpoint.pth')   
+                    torch.save(self, 'model.pth')
+                    
+    def do_train_on_vid(self, file_path, epochs, batches_per_epoch=10, batch_size=128, lr=1e-4, verbose=1, checkpoint=None):
+        optimizer = optim.Adam(self.parameters(), lr=lr)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
+        
+        if checkpoint:
+            self.load_state_dict(checkpoint['state_dict'])
+            self.to(self.device)
+            optimizer.load_state_dict(checkpoint['optimizer'])
+            for state in optimizer.state.values():
+                for k, v in state.items():
+                    if isinstance(v, torch.Tensor):
+                        state[k] = v.to(self.device)
+                        
+                        
+        min_loss = 1e8
+        count = 0
+        
+        vidcap = cv2.VideoCapture(file_path)
+        success,image = vidcap.read()
+        
+        for epoch in range(epochs):
+            count = 0
+            running_loss = 0
+            
+            for batch_idx in range(batches_per_epoch):
+                
+                xbatch = []
+                
+                #March through the data
+                while success and count < batch_size:
+                    # save frame as JPEG file      
+                    success, image = vidcap.read()
+                    xbatch.append(image / 255)
+                    count += 1
+                    
+                xbatch = torch.as_tensor(xbatch).to(self.device)
+                ybatch = torch.as_tensor(xbatch).to(self.device)
+                
+                y_hat = self.forward(xbatch)
+            
+                loss = ((y_hat - ybatch)**2).mean()
+                
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                
+                #if not torch.isnan(loss): 
+                running_loss += loss.detach()
+            
+            #Reload video if march is finished
+            if not success:
+                vidcap = cv2.VideoCapture(file_path)
+                success,image = vidcap.read()
+            
+            running_loss /= batches_per_epoch
             
             if (epoch + 1)%verbose == 0:
                 print('[%d]: %.16f' % (epoch + 1, running_loss))
