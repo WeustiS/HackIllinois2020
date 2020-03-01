@@ -127,9 +127,11 @@ class Baseline(nn.Module):
                 while success and count < batch_size:
                     # save frame as JPEG file      
                     success, image = vidcap.read()
+                    image = cv2.resize(image, (1152, 2048))
                     xbatch.append(image / 255)
                     count += 1
-                    print(image.shape)
+                    print(count)
+                   
                     
                 xbatch = torch.as_tensor(xbatch).to(self.device)
                 ybatch = torch.as_tensor(xbatch).to(self.device)
