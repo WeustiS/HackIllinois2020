@@ -107,7 +107,7 @@ class Baseline(nn.Module):
                         
         min_loss = 1e8
         count = 0
-        test_frame = torch.load(os.path.join(folder_path, 'frame0.pth'))
+        test_frame = torch.load(os.path.join(folder_path, 'frame0'))
         
         
         for epoch in range(epochs):
