@@ -23,7 +23,7 @@ class Baseline(nn.Module):
     def forward(self, x):
         plt.imsave("./frames_m1/input.jpg", x.cpu().squeeze().permute(1, 2, 0).numpy())
         interm_out, res = self.conv1(x)
-        plt.imsave("./frames_m1/res.jpg", res.squeeze().cpu().detach().numpy())
+        plt.imsave("./frames_m1/res.jpg", res.squeeze().cpu().detach().numpy(), cmap="grayscale")
 
         plt.imsave("./frames_m1/l1.jpg", (
             torch.cat((torch.max(interm_out[:, :2], 1).values.unsqueeze(1), interm_out[:, 2:]),
