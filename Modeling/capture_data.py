@@ -28,10 +28,10 @@ import numpy as np
 def decompose(file_path, save_path, batch_size=64):
     import os
     vidcap = cv2.VideoCapture(file_path)
-    success,image = vidcap.read()
+    success,preimage = vidcap.read()
     count = 0
     batch_num = 0
-    data = np.zeros((batch_size, image.shape[2], image.shape[0], image.shape[1]))
+    data = np.zeros((batch_size, preimage.shape[2], preimage.shape[0], preimage.shape[1]))
     
     frame_count = 0
     while success and batch_num < batch_size:
@@ -44,7 +44,7 @@ def decompose(file_path, save_path, batch_size=64):
         if count%batch_size==0:
             frame_count = 0
             torch.save(torch.from_numpy(data), os.path.join(save_path, 'batch_' + str(batch_num) + '.pth'))
-            data = np.zeros((batch_size, image.shape[2], image.shape[0], image.shape[1]))
+            data = np.zeros((batch_size, preimage.shape[2], preimage.shape[0], preimage.shape[1]))
             batch_num += 1
             print("Loading video %s: %.2f%%" % (file_path, batch_num * 100 / batch_size))
             
