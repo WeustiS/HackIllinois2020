@@ -43,7 +43,7 @@ class Baseline(nn.Module):
         
         return interm_out
 
-    def do_train(self, x, y, epochs, batch_size=32, lr=1e-4, verbose=1, checkpoint=None):
+    def do_train(self, x, y, epochs, batch_size=128, lr=1e-4, verbose=1, checkpoint=None):
         optimizer = optim.Adam(self.parameters(), lr=lr)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
         
@@ -92,6 +92,7 @@ class Baseline(nn.Module):
                                   'optimizer': optimizer.state_dict()}
                         
                     torch.save(checkpoint, 'checkpoint.pth')   
+                    torch.save(self, 'model.pth')
 
 def sparsify(x):
     idx = torch.nonzero(x, as_tuple=True)

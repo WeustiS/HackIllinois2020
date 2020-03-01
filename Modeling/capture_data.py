@@ -12,7 +12,7 @@ def get_frames(filepath):
     data = []
 
     while success and count < 64:
-        cv2.imwrite("frame%d.jpg" % count, image)     # save frame as JPEG file      
+        # save frame as JPEG file      
         success, image = vidcap.read()
         data.append(image / 255)
         count += 1
