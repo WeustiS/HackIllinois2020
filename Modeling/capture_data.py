@@ -38,7 +38,7 @@ def decompose(file_path, save_path, batch_size=64):
         # save frame as JPEG file      
         success, image = vidcap.read()
         image = np.transpose((image / 255), (2, 0, 1))
-        data[frame_count] = torch.as_tensor(image)
+        data[frame_count] = torch.from_numpy(image)
         frame_count += 1
         count += 1
         if count%batch_size==0:
