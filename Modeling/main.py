@@ -4,7 +4,7 @@ import visualize as v
 import torch
 
 #Import data
-data = d.get_frames('vid1.mp4')
+data = d.get_frames('training_data/vid1.mp4')
 
 #Declare model
 model = b.Baseline('cuda:0').to('cuda:0')

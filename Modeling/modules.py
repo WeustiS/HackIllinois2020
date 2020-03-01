@@ -49,8 +49,8 @@ class CNNBlock2d(nn.Module):
         if self.use_wavelet:
             res = torch.nn.functional.conv2d(x, self.wave_filt, stride=2)
             res = torch.max(res[:,1:], dim=1).values.unsqueeze(1)
-            res[res < thresh] = 0
-        
+            res = torch.nn.functional.relu(res - thresh)
+
         interm_out = self.conv(x)
         if self.use_batch_norm:
             interm_out = self.batch_norm(interm_out)
