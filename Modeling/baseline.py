@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import numpy as np
 import torch.optim as optim
-import cv2
 
 import modules as m
 

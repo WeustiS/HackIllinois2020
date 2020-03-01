@@ -61,12 +61,15 @@ r = torch.rand(1, 3, 1920, 2160).to('cuda')
 r0 = torch.rand(1, 3, 1920, 2160).to('cuda')
 
 def measure(model, r):
-    t0 = time.time()
+    arr = [0] * 9
     for i in range(25):
         model(r)
-    return time.time()-t0
+    for i in range(10):
+        arr = [sum(x) for x in zip(arr, model(r))]
+    return sum(arr)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 model = Baseline().to("cuda")
 
 print("Unpruned time", measure(model, r), "\n")
