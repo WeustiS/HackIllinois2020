@@ -121,7 +121,7 @@ class Baseline(nn.Module):
                 
                 #March through the data
                 for i in range(batch_size):
-                    img = torch.load(os.path.join(folder_path, 'frame' + str(count) + '.pth'))
+                    img = torch.load(os.path.join(folder_path, 'frame' + str(count)))
                     xbatch[i] = img
                     ybatch[i] = img
                     
