@@ -90,7 +90,8 @@ class Baseline(nn.Module):
                     torch.save(checkpoint, 'checkpoint.pth')   
                     torch.save(self, 'model.pth')
                     
-    def do_train_on_vid(self, file_path, epochs, batches_per_epoch=10, batch_size=128, lr=1e-4, verbose=1, checkpoint=None):
+    def do_train_on_vid(self, folder_path, epochs, batches_per_epoch=10, batch_size=128, lr=1e-4, verbose=1, checkpoint=None):
+        import os
         optimizer = optim.Adam(self.parameters(), lr=lr)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
         
@@ -106,9 +107,8 @@ class Baseline(nn.Module):
                         
         min_loss = 1e8
         count = 0
+        test_frame = torch.load(os.path.join(folder_path, 'frame0.pth'))
         
-        vidcap = cv2.VideoCapture(file_path)
-        success,image = vidcap.read()
         
         for epoch in range(epochs):
             count = 0
@@ -116,18 +116,17 @@ class Baseline(nn.Module):
             
             for batch_idx in range(batches_per_epoch):
                 
-                xbatch = []
+                xbatch = torch.zeros(batch_size, test_frame.shape[1], test_frame.shape[2], test_frame.shape[3])
+                ybatch = torch.zeros(batch_size, test_frame.shape[1], test_frame.shape[2], test_frame.shape[3])
                 
                 #March through the data
-                while success and count < batch_size:
-                    # save frame as JPEG file      
-                    success, image = vidcap.read()
-                    image = cv2.resize(image, (1152, 2048))
-                    xbatch.append(image / 255)
-                    count += 1
+                for i in range(batch_size):
+                    img = torch.load(os.path.join(folder_path, 'frame' + str(count) + '.pth'))
+                    xbatch[i] = img
+                    ybatch[i] = img
                     
-                xbatch = torch.as_tensor(xbatch).to(self.device).permute(0, 3, 1, 2)
-                ybatch = torch.as_tensor(xbatch).to(self.device).permute(0, 3, 1, 2)
+                xbatch = xbatch.to(self.device)
+                ybatch = ybatch.to(self.device)
                 
                 y_hat = self.forward(xbatch)
             
