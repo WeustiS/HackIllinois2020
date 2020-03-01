@@ -44,3 +44,4 @@ def decompose(file_path, save_path, batch_size=128):
             data = []
             batch_num += 1
             print("Loading video %s: %.2f%%" % (file_path, batch_num * 100 / batch_size))
+        print(count)
