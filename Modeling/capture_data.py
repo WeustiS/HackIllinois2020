@@ -25,7 +25,7 @@ def get_frames(filepath, max_frames=1e7, verbose=1000):
     return data.permute(0, 3, 1, 2)
 
 
-def decompose(file_path, save_path, batch_size=128):
+def decompose(file_path, save_path, batch_size=64):
     import os
     vidcap = cv2.VideoCapture(file_path)
     success,image = vidcap.read()
