@@ -22,14 +22,14 @@ class Baseline(nn.Module):
     def forward(self, x):
         interm_out, res = self.conv1(x)
         interm_out = self.conv2(interm_out)
-        interm_out = self.conv3(interm_out)
+        encoding = self.conv3(interm_out)
 
-        interm_out = self.deconv2(interm_out)
+        interm_out = self.deconv2(encoding)
         interm_out = self.deconv3(interm_out)
         interm_out = torch.cat((interm_out, res), 1)
         interm_out = self.deconv4(interm_out)
         
-        return interm_out
+        return interm_out, encoding
         
     def encode(self, x):
         interm_out, res = self.conv1(x)
@@ -64,7 +64,7 @@ class Baseline(nn.Module):
                 xbatch = x[batch_idx*batch_size:(batch_idx+1)*batch_size].to(self.device).float()
                 ybatch = y[batch_idx*batch_size:(batch_idx+1)*batch_size].to(self.device).float()
                 
-                y_hat = self.forward(xbatch)
+                y_hat, encoding = self.forward(xbatch)
             
                 loss = ((y_hat - ybatch)**2).mean()
                 
@@ -89,7 +89,7 @@ class Baseline(nn.Module):
                     torch.save(checkpoint, 'checkpoint.pth')   
                     torch.save(self, 'model.pth')
                     
-    def do_train_on_vid(self, folder_path, epochs, batches_per_epoch=100, batch_size=64, lr=1e-4, verbose=1, checkpoint=None):
+    def do_train_on_vid(self, folder_path, epochs, batches_per_epoch=100, batch_size=64, lr=1e-5, lambda_coef=1e-3, verbose=1, checkpoint=None):
         import os
         optimizer = optim.Adam(self.parameters(), lr=lr)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
@@ -127,9 +127,10 @@ class Baseline(nn.Module):
                 xbatch = xbatch.to(self.device)
                 ybatch = ybatch.to(self.device)
                 
-                y_hat = self.forward(xbatch)
-            
-                loss = ((y_hat - ybatch)**2).mean()
+                y_hat, encoding = self.forward(xbatch)
+                
+                L1_loss = lambda_coef * torch.abs(encoding).mean()
+                loss = ((y_hat - ybatch)**2).mean() + L1_loss
                 
                 optimizer.zero_grad()
                 loss.backward()
@@ -141,7 +142,7 @@ class Baseline(nn.Module):
             running_loss /= batches_per_epoch
             
             if (epoch + 1)%verbose == 0:
-                print('[%d]: %.16f' % (epoch + 1, running_loss))
+                print('[%d]: %.16f %.8f' % (epoch + 1, running_loss, L1_loss))
                 scheduler.step(running_loss)
                 if running_loss < min_loss:
                     min_loss = running_loss
